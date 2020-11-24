@@ -2,8 +2,8 @@ import axios from 'axios'
 
 axios.get('https://chef-app-f6ff4.firebaseio.com/.json')
     .then(response => {
-        console.log('pierwszy then', response.data)
-        console.log(response.data.users.name.first)
+        //console.log('pierwszy then', response.data)
+        //console.log(response.data.users.name.first)
     })
     .catch(() => console.log('błąd'))
 
