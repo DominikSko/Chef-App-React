@@ -1,6 +1,8 @@
-import { Typography, Paper, List, ListItem, ListItemIcon, ListItemText } from '@material-ui/core'
+import { Typography, Paper, List, ListItem, ListItemIcon, ListItemText, Button } from '@material-ui/core'
+import {Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions} from '@material-ui/core'
 import DotIcon from '@material-ui/icons/Brightness1'
 import React from 'react'
+import EditRecipe from '../components/EditRecipe'
 import imgPlaceholder from '../img/img-placeholder.png'
 
 const styles={
@@ -8,6 +10,10 @@ const styles={
 }
 
 const SingleRecipe = props => {
+
+    const [isDeleteDialogOpen, setIsDeleteDialogOpen] = React.useState(false)
+    const [isEditDialogOpen, setIsEditDialogOpen] = React.useState(false)
+    
     if(!props.data){
         return (
             <div>
@@ -118,6 +124,65 @@ const SingleRecipe = props => {
                     {props.data.description}
                 </Typography>
             </div>
+            <div
+            style={{width: '100%', marginTop: 25, display: 'flex', justifyContent: 'flex-end'}}
+            >
+                <Button
+                style={{margin: 10}}
+                variant='contained'
+                color='primary'
+                onClick={() => setIsDeleteDialogOpen(true)}
+                >
+                    Usuń
+                </Button>
+                <Button
+                style={{margin: 10}}
+                variant='contained'
+                color='secondary'
+                onClick={() => setIsEditDialogOpen(true)}
+                >
+                    Edytuj
+                </Button>
+            </div>
+            <Dialog
+            open={isDeleteDialogOpen}
+            onClose={() => setIsDeleteDialogOpen(false)}
+            >
+                <DialogTitle>{"Czy napewno chcesz usunąć przepis?"}</DialogTitle>
+                <DialogContent>
+                <DialogContentText id="alert-dialog-description">
+                    Przepis zostanie trwale usunięty. Nie można odwrócić tej operacji
+                </DialogContentText>
+                </DialogContent>
+                <DialogActions>
+                <Button 
+                onClick={() => {
+                    props._deleteRecipe(
+                        props.param, 
+                        props.back,
+                        () => setIsDeleteDialogOpen(false)
+                    )
+                }}
+                color="primary"
+                >
+                    Usuń
+                </Button>
+                <Button 
+                onClick={() => setIsDeleteDialogOpen(false)} 
+                color="secondary" 
+                autoFocus
+                >
+                    Anuluj
+                </Button>
+                </DialogActions>
+            </Dialog>
+            {isEditDialogOpen && 
+                <EditRecipe
+                onClose={() => setIsEditDialogOpen(false)}
+                data={props.data}
+                _editRecipe={props._editRecipe}
+                />
+            }
         </Paper>
     )
 }

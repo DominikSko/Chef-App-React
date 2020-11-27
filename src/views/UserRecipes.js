@@ -1,18 +1,23 @@
 import { Typography } from '@material-ui/core'
 import React from 'react'
 import { connect } from 'react-redux'
-import {getRecipesAsyncActionCreator} from '../state/recipes'
+import {getRecipesAsyncActionCreator, deleteRecipeAsyncActionCreator, editRecipeAsyncActionCreator} from '../state/recipes'
 import RecipesList from '../components/RecipesList'
 import SingleRecipe from './SingleRecipe'
+import MultiAutocompleteInput from '../components/MultiAutocompleteInput'
 
 const styles={
-    refresh: {cursor: 'pointer', color: 'blue'}
+    refresh: {cursor: 'pointer', color: 'blue'},
+    autocomplete:{maxWidth: 700, margin:'30px auto'},
+    noRecipes: {cursor: 'pointer'}
 }
 
 class UserRecipes extends React.Component{
     state = {
-
+        selectedItem: []
     }
+    setSelectedItem = (items) => this.setState({selectedItem: items})
+
     componentDidMount(){
         this.getData()
     }
@@ -21,6 +26,12 @@ class UserRecipes extends React.Component{
     }
 
     render(){
+        if (this.props._isFetching.length === 0){
+
+        const recipesToShow = this.props._recipes.filter(recipe => {
+            const ingredients = recipe.ingredients.map(el => el.ingredient)
+            return this.state.selectedItem.reduce((red, el) => ingredients.includes(el) ? red : false, true)
+        })
         if (this.props._isError){
             return(
                 <div>
@@ -42,6 +53,28 @@ class UserRecipes extends React.Component{
                 </div>
             )
         }
+        if(this.props._recipes.length === 0){
+            return(
+                <div>
+                    <Typography
+                    variant='h4'
+                    color='secondary'
+                    align='center'
+                    >
+                        Nie dodałeś/aś jeszcze żadnych przepisów
+                    </Typography>
+                    <Typography
+                    style={styles.noRecipes}
+                    variant='h4'
+                    align='center'
+                    color='primary'
+                    onClick={() => this.props.history.push('/add-recipe')}
+                    >
+                        Dodaj przepis
+                    </Typography>
+                </div>
+            )
+        }
 
         if(this.props.match.params.id){
             const recipe = this.props._recipes.find(el => el.key === this.props.match.params.id)
@@ -49,27 +82,55 @@ class UserRecipes extends React.Component{
             data={recipe}
             param={this.props.match.params.id}
             back={() => this.props.history.push('/your-recipes')}
+            _deleteRecipe={this.props._deleteRecipe}
+            _editRecipe={this.props._editRecipe}
             />  
         }
         return (
             <div>
+                <div
+                    style={styles.autocomplete}
+                >
+                    <MultiAutocompleteInput 
+                        label='Co masz w lodówce?'
+                        placeholder='Wybierz produkt (zacznij pisać i wybierz z listy)'
+                        suggestions={this.props._suggestions}
+                        setSelectedItem={this.setSelectedItem}
+                        selectedItem={this.state.selectedItem}
+                    />
+                </div>
                 <RecipesList 
-                data={this.props._recipes}
+                data={recipesToShow}
                 route='/your-recipes'
                 changeRoute={this.props.history.push}
                 />
+                {recipesToShow.length === 0 && 
+                    <Typography
+                        color='secondary'
+                        align='center'
+                        variant='h4'
+                    >
+                        Nie ma przepisu zawierającego te składniki
+                    </Typography>
+                }
             </div>
         )
+    }
+    return null
     }
 }
 
 const mapStateToProps = state => ({
     _isError: state.recipes.isError,
-    _recipes: state.recipes.recipes
+    _recipes: state.recipes.recipes,
+    _suggestions: state.recipes.suggestions,
+    _isFetching: state.fullScreenCircuralProgress.circurals
 })
 
 const mapDispatchToProps = dispatch => ({
-    _getData: () => dispatch(getRecipesAsyncActionCreator())
+    _getData: () => dispatch(getRecipesAsyncActionCreator()),
+    _deleteRecipe: (key, success, error) => dispatch(deleteRecipeAsyncActionCreator(key, success, error)),
+    _editRecipe: (form, key, success, error) => dispatch(editRecipeAsyncActionCreator(form, key, success, error))
 })
 
 export default connect(

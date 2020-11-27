@@ -11,23 +11,26 @@ import Dashboard from './views/Dashboard'
 import Recipes from './views/Recipes'
 import UserRecipes from './views/UserRecipes'
 import ChangePassword from './views/ChangePassword'
+import Auth from './Auth'
 
 
 const App = props => {
     return (
         <div>
-            <BrowserRouter>
-                <AppBar />
-                <Drawer />
-                <Route path='/' exact component={Dashboard}/>
-                <Route path='/add-recipe' component={AddRecipe}/>
-                <Route path='/recipes' component={Recipes}/>
-                <Route path='/your-recipes/:id?' component={UserRecipes}/>
-                <Route path='/change-password' component={ChangePassword}/>
-            </BrowserRouter>
-                <FullScreenCircuralProgress />
-                <Snackbars />
-                <ScrollToTop />
+            <Auth>
+                <BrowserRouter>
+                    <AppBar />
+                    <Drawer />
+                    <Route path='/' exact component={Dashboard}/>
+                    <Route path='/add-recipe' component={AddRecipe}/>
+                    <Route path='/recipes' component={Recipes}/>
+                    <Route path='/your-recipes/:id?' component={UserRecipes}/>
+                    <Route path='/change-password' component={ChangePassword}/>
+                </BrowserRouter>
+            </Auth>
+            <FullScreenCircuralProgress />
+            <Snackbars />
+            <ScrollToTop />
         </div>
     )
 }

@@ -35,10 +35,62 @@ export const getRecipesAsyncActionCreator = () => (dispatch, getState) => {
         })
 }
 
-const saveRecipesActionCreator = recipes => ({
-    type: SAVE_RECIPES,
-    recipes
-})
+export const deleteRecipeAsyncActionCreator = (key, success, error) => (dispatch, getState) => {
+    dispatch(circuralProgress.add())
+    axios.delete(URL +'recipes/'+ key +'.json')
+        .then(() => {
+            const recipes = getState().recipes.recipes
+            const recipesAfterDelete = recipes.filter(recipe => recipe.key !== key)
+            dispatch(saveRecipesActionCreator(recipesAfterDelete))
+            dispatch(addSnackBar('Przepis usunięto prawidłowo'))
+            dispatch(circuralProgress.remove())
+            success()
+        })
+        .catch(() => {
+            dispatch(addSnackBar('Usuwanie nie powiodło się, spróboj ponowie później', 'red'))
+            dispatch(circuralProgress.remove())
+            error()
+        })
+}
+
+export const editRecipeAsyncActionCreator = (form, key, success, error) => (dispatch, getState) => {
+    dispatch(circuralProgress.add())
+    axios.patch(URL +'recipes/'+ key +'.json', form)
+        .then(() => {
+            const recipes = getState().recipes.recipes
+            const recipesAfterEdit = recipes.map(recipe => {
+                if(recipe.key === key){
+                return form
+                }
+                return recipe
+            })
+            dispatch(saveRecipesActionCreator(recipesAfterEdit))
+            dispatch(addSnackBar('Przepis edytowano.'))
+            dispatch(circuralProgress.remove())
+            success()
+        })
+        .catch(() => {
+            dispatch(addSnackBar('Edytowanie nie powiodło się, spróboj ponowie później', 'red'))
+            dispatch(circuralProgress.remove())
+            error()
+        })
+}
+
+const saveRecipesActionCreator = recipes => {
+    // const numbers = [1,2,3]
+    // console.log(numbers.map(el => el * 2))
+    // console.log(numbers.reduce((red, el)=> [...red, el*2],[]))
+    // reduce, wrzucamy kolejny element przy cyklu i dodajemy to co juz jest ...red
+    const suggestions = recipes.reduce((red, el) => [...red, ...el.ingredients] ,[])
+    .reduce((red, el) => red.includes(el.ingredient) ? red : [...red, el.ingredient],[])
+    //.map(el => el.ingredient) aby ingredient sie nie duplikowal uzywamy reduce jeszcze raz
+    //console.log(suggestions)
+    return {
+        type: SAVE_RECIPES,
+        recipes,
+        suggestions
+    }   
+}
 
 const errorOnGetRecipesActionCreator = () => ({
     type: ERROR_ON_GET
@@ -46,6 +98,7 @@ const errorOnGetRecipesActionCreator = () => ({
 
 const initialState = {
     recipes: [],
+    suggestions: [],
     isError: false
 }
 	
@@ -55,7 +108,8 @@ const recipes = (state = initialState, action) => {
         return {
             ...state,
             isError: false,
-            recipes: action.recipes
+            recipes: action.recipes,
+            suggestions: action.suggestions
         }
         case ERROR_ON_GET:
             return {
