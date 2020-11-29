@@ -5,6 +5,7 @@ import {withRouter, Link } from 'react-router-dom'
 import {connect} from 'react-redux'
 import {openDrawerActionCreator} from '../state/drawer'
 //import { logOutActionCreator} from '../state/auth'
+import { logOutActionCreator } from '../state/auth'
  
 import AppBar from '@material-ui/core/AppBar'
 import Toolbar from '@material-ui/core/Toolbar'
@@ -89,7 +90,7 @@ const MenuAppBar = props => {
                                 to='/'
                                 style={styles.link}
                             >
-                                <MenuItem onClick={handleClose}>Wyloguj sie</MenuItem>
+                                <MenuItem onClick={props._logOut}>Wyloguj sie</MenuItem>
                             </Link>
                         </Menu>
                     </div>
@@ -101,7 +102,8 @@ const MenuAppBar = props => {
  
 const mapDispatchToProps = (dispatch) => ({
     _drawerOpen: () => dispatch(openDrawerActionCreator()),
-    // _logOut: () => dispatch(logOutActionCreator())
+    // _logOut: () => dispatch(logOutActionCreator()),
+    _logOut: () => dispatch(logOutActionCreator())
 })
  
 export default connect(

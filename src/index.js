@@ -12,6 +12,9 @@ import App from './App'
 import {addSnackBar} from './state/snackbars'
 import './state/zapytania'
 import './main.css'
+import { autoLogInAsyncActionCreator} from './state/auth'
+
+store.dispatch(autoLogInAsyncActionCreator())
 
 window.snack = (text, color, time) => store.dispatch(addSnackBar(text, color, time))
 

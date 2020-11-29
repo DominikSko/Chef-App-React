@@ -2,6 +2,7 @@ import React from 'react'
 import { connect } from 'react-redux'
 import LoginForm from './LoginForm'
 import RegisterForm from './RegisterForm'
+import { registerAsyncActionCreator, logInAsyncActionCreator, resetPasswordAsyncActionCreator } from '../state/auth'
 
 const Auth = props => {
     const [toggleForm, setToggleForm] = React.useState(true)
@@ -13,10 +14,13 @@ const Auth = props => {
             toggleForm ?
             <LoginForm 
             toggleForm={() => setToggleForm(false)}
+            _logIn={props._logIn}
+            _resetPassword={props._resetPassword}
             />
             :
             <RegisterForm 
             toggleForm={() => setToggleForm(true)}
+            _register={props._register}
             />         
     )
 }
@@ -25,7 +29,11 @@ const mapStateToProps = state => ({
     _isLogged: state.auth.isLogged
 })
 
-const mapDispatchToProps = dispatch => ({})
+const mapDispatchToProps = dispatch => ({
+    _register: (email, password) => dispatch(registerAsyncActionCreator(email, password)),
+    _logIn: (email, password) => dispatch(logInAsyncActionCreator(email, password)),
+    _resetPassword: (email, success) => dispatch(resetPasswordAsyncActionCreator(email, success))
+})
 
 export default connect(
     mapStateToProps,

@@ -29,7 +29,7 @@ const LoginForm = props => {
         const isPwdError = pwdValidate(pwd)
 
         if(!isEmailError && !isPwdError){
-            console.log('próba logowania')
+            props._logIn(email, pwd)
         }
     }
 
@@ -51,7 +51,7 @@ const LoginForm = props => {
     const forgotOnSubmit = () => {
         const isEmailError = forgotEmailValidate(forgotEmail)
         if (!isEmailError){
-            console.log('próba wysłania')
+            props._resetPassword(forgotEmail, () => setIsForgotPanelOpen(false))
         }
     }
 
